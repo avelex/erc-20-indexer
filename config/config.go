@@ -10,6 +10,7 @@ import (
 type Config struct {
 	RPC          string         `env:"RPC" env-required:"true"`
 	TokenAddress common.Address `env:"TOKEN_ADDRESS" env-required:"true"`
+	DB           string         `env:"DB" env-required:"true"`
 }
 
 func LoadConfig() (Config, error) {

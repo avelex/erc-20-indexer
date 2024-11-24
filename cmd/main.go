@@ -10,8 +10,9 @@ import (
 
 	"github.com/avelex/erc-20-indexer/config"
 	"github.com/avelex/erc-20-indexer/internal/indexer"
-	"github.com/avelex/erc-20-indexer/internal/repository/memory"
+	"github.com/avelex/erc-20-indexer/internal/repository/timescale"
 	"github.com/avelex/erc-20-indexer/internal/server"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
@@ -34,7 +35,14 @@ func main() {
 
 	log.Info().Msgf("config: %+v", cfg)
 
-	repo := memory.New()
+	db, err := pgxpool.New(ctx, cfg.DB)
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed to connect to db")
+	}
+
+	defer db.Close()
+
+	repo := timescale.NewRepository(db)
 	indexer := indexer.New(cfg, repo)
 	handler := server.New(repo)
 
